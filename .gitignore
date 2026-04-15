@@ -1,0 +1,13 @@
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# Runtime state (never commit)
+~/.h1v3/
+.h1v3/
+
+# OS junk
+.DS_Store
+Thumbs.db
