@@ -6,7 +6,7 @@
 📘 h1v3 Runtime — README
 
 ---------------------------------------------------------------------
-🚀 Start the h1v3 Agent Runtime after Agent creation
+      🚀 Start the h1v3 Agent Runtime after Agent creation
 
 From inside the h1v3-runtime directory:
 
@@ -24,7 +24,7 @@ h1v3 runtime listening on 3928
 Leave this terminal running — it is the active agent engine.
 
 ---------------------------------------------------------------------
-🤖 Send a Request to an Agent
+      🤖 Send a Request to an Agent
 
 Open a second terminal and run:
 bash
@@ -48,8 +48,8 @@ This confirms:
     - the tool executed
     - the agent produced a final answer
 
-========================================================================
-📁 Agent Directory Structure
+----------------------------------------------------------------------
+      📁 Agent Directory Structure
 
 Agents live in:
 
@@ -71,8 +71,7 @@ First Agent Example:
         listDirectory.js
 
 -------------------------------------------------------------------------
-
-🛠 Add New Tools
+      🛠 Add New Tools
 
 Add new tools inside:
 
@@ -89,8 +88,7 @@ module.exports = {
 Tools are auto‑loaded and hot‑reloaded by the runtime.
 
 -------------------------------------------------------------------------
-
-🧠 Add New Agents
+      🧠 Add New Agents
 
 Create a new folder:
 
@@ -105,14 +103,15 @@ Add:
 The runtime will automatically detect and load it.
 
 -------------------------------------------------------------------------
-
-🧩 Model Requirements
+      🧩 Model Requirements
 
 The runtime uses the model specified in each agent’s agent.json.
 
-Example:
+Examples:
 
+"model": "qwen2.5:7b-instruct"
 "model": "gemma4:e2b"
+"model": "llama3.1:8b"
 
 Ensure the model is installed:
 
@@ -120,4 +119,7 @@ ollama list
 
 Install if needed:
 
-ollama pull gemma4:e2b
+ollama pull qwen2.5:7b-instruct
+
+NOTE:  The models listed above are the only open-weight models I have tested in my h1v3-runtime so far..
+NOTE:  So far in my research and design qwen.5:7b-instruct has been the most successful model in multi-tool call chaining. Feel free to experiment with different tool-call capable models.
