@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="h1v3-runtime_logo.png" alt="h1v3-runtime logo" width="300">
+</p>
+
+
 📘 h1v3 Runtime — README
 
 ---------------------------------------------------------------------
