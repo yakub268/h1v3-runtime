@@ -3,6 +3,11 @@
 </p>
 
 
+      Validated Architectures:
+      - x86_64 (Ubuntu 22.04)
+      - arm64 (Jetson AGX Orin 64GB dev kit)
+
+
 📘 h1v3 Runtime — README
 
 ---------------------------------------------------------------------
