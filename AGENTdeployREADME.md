@@ -11,6 +11,23 @@ curl -X POST http://localhost:3928/agent/directory_scout \
   -d '{"input": "List the files in /home/<your-username>"}'
 
 
+                    OR
+
+
+curl -X POST http://localhost:3928/agent/wifi_manager \
+  -H "Content-Type: application/json" \
+  -d '{"input":"Scan for available WiFi networks and list them for me in a readable format."}'
+
+
+                    OR
+
+
+curl -X POST http://localhost:3928/agent/vitals_scout \
+  -H "Content-Type: application/json" \
+  -d '{"input":"Check my system vitals and summarize them for me."}'
+
+
+
 If everything is set up correctly, you’ll receive a JSON response containing the agent’s final answer.
 
 
