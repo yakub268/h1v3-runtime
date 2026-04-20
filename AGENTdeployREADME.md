@@ -27,6 +27,14 @@ curl -X POST http://localhost:3928/agent/vitals_scout \
   -d '{"input":"Check my system vitals and summarize them for me."}'
 
 
+                    OR
+
+
+curl -X POST http://localhost:3928/agent/cron_manager \
+  -H "Content-Type: application/json" \
+  -d '{"input":"Schedule /home/n3z/agent_test.py to run at 11:50am MST."}'
+
+
 
 If everything is set up correctly, you’ll receive a JSON response containing the agent’s final answer.
 
