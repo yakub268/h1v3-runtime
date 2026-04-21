@@ -7,34 +7,6 @@ NOTE:  You must create this directory structure for the runtime.
 </p>
 
 
-~/home/user-name/.h1v3/
-                  └── agents
-                      ├── cron_manager
-                      │   ├── agent.js
-                      │   ├── agent.json
-                      │   ├── sessions
-                      │   └── tools
-                      │       ├── cronTask.js
-                      │       └── parseCronTime.js
-                      ├── directory_scout
-                      │   ├── agent.js
-                      │   ├── agent.json
-                      │   ├── sessions
-                      │   └── tools
-                      │       ├── listDirectory.js
-                      │       └── readFile.js
-                      ├── vitals_scout
-                      │   ├── agent.js
-                      │   ├── agent.json
-                      │   ├── sessions
-                      │   └── tools
-                      │       └── systemOverview.js
-                      └── wifi_manager
-                          ├── agent.js
-                          ├── agent.json
-                          ├── sessions
-                          └── tools
-                              └── scanNet.js
 
 
 
