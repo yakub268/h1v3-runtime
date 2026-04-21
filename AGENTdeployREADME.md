@@ -2,6 +2,10 @@
 
 NOTE:  You must create this directory structure for the runtime. 
 
+<p align="center">
+  <img src="h1v3-runtime_agent_structure.png" alt="h1v3-runtime agent structure" width="300">
+</p>
+
 
 ~/home/user-name/.h1v3/
                   └── agents
