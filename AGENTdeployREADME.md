@@ -7,9 +7,6 @@ NOTE:  You must create this directory structure for the runtime.
 </p>
 
 
-
-
-
                         --- Talk to your agent ---
 
 Once your runtime is running in one terminal, you can interact with any agent using a simple curl POST request.
