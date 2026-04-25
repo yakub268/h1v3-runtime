@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>h1v3-runtime Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container">
+        <img id="logo" src="h1v3-runtime_logo.png" alt="h1v3-runtime logo">
+
+        <div id="columns">
+            <div class="column">
+                <h2>Models</h2>
+                <ul id="model-list"></ul>
+            </div>
+
+            <div class="column">
+                <h2>Agents</h2>
+                <ul id="agent-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔥 NEW: Agent Subwindow Panel -->
+    <div id="agent-panel" class="hidden">
+        <div id="agent-panel-content">
+            <button id="agent-close">X</button>
+
+            <!-- ⭐ NEW: Agent Profile Picture -->
+            <img id="agent-profile-pic" class="profile-pic" src="" alt="Agent Profile">
+
+            <h2 id="agent-panel-title"></h2>
+
+            <div id="agent-status"></div>
+            <div id="agent-tools"></div>
+
+            <textarea id="agent-input" placeholder="Send a message to this agent.."></textarea>
+            <button id="agent-send">Send</button>
+
+            <div id="agent-response"></div>
+        </div>
+    </div>
+    <!-- 🔥 END NEW PANEL -->
+
+    <!-- 🔥 NEW: Model Subwindow Panel -->
+    <div id="model-panel" class="hidden">
+        <div id="model-panel-content">
+            <button id="model-close">X</button>
+            <h2 id="model-panel-title"></h2>
+
+            <div id="model-status"></div>
+            <div id="model-info"></div>
+
+            <textarea id="model-input" placeholder="Send a message to this model..."></textarea>
+            <button id="model-send">Send</button>
+
+            <div id="model-response"></div>
+        </div>
+    </div>
+    <!-- NEW: Model Subwindow Panel -->
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

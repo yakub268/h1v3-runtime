@@ -6,9 +6,73 @@ const chokidar = require("chokidar");
 
 const AGENT_ROOT = path.join(process.env.HOME || process.env.HOMEPATH || ".", ".h1v3", "agents");
 const app = express();
+
+// ⭐ Serve static assets (agent pics, etc.)
+app.use("/assets", express.static(path.join(process.env.HOME, ".h1v3/assets")));
+
 app.use(express.json());
 
+// Allow dashboard (3030) to call runtime API (3928)
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3030");
+  res.header("Access-Control-Allow-Methods", "GET,POST");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+
 let agents = {};
+
+
+// --- DASHBOARD SERVER Test Block ---
+function launchDashboard() {
+  const http = require("http");
+  const { spawn } = require("child_process");
+
+  const DASHBOARD_PORT = 3030;
+  const dashboardDir = path.join(process.cwd(), "dashboard");
+
+  // Serve static dashboard files + agent pics
+  const server = http.createServer((req, res) => {
+      let filePath;
+
+      // ⭐ Serve agent profile pictures from ~/.h1v3/assets
+      if (req.url.startsWith("/assets/")) {
+          filePath = path.join(process.env.HOME, ".h1v3", req.url);
+      } else {
+          // Serve dashboard files from ./dashboard
+          filePath = path.join(
+              dashboardDir,
+              req.url === "/" ? "index.html" : req.url
+          );
+      }
+
+      fs.readFile(filePath, (err, data) => {
+          if (err) {
+              res.writeHead(404);
+              return res.end("Not found");
+          }
+          res.writeHead(200);
+          res.end(data);
+      });
+  });
+
+
+  server.listen(DASHBOARD_PORT, () => {
+    console.log(`📊 h1v3 dashboard running at http://localhost:${DASHBOARD_PORT}`);
+
+    // Auto-open window
+    const opener =
+      process.platform === "win32"
+        ? "start"
+        : process.platform === "darwin"
+        ? "open"
+        : "xdg-open";
+
+    spawn(opener, [`http://localhost:${DASHBOARD_PORT}`]);
+  });
+}
+// ----------------------------------------------
+
 
 // Load all agents from ~/.h1v3/agents
 function loadAgents() {
@@ -110,7 +174,82 @@ function extractJSON(text) {
   }
 }
 
-// Main agent endpoint
+
+// Main agent and model endpoints
+
+// agent to dashboard API endpoint
+app.get("/api/agents", (req, res) => {
+  res.json({ agents: Object.keys(agents) });
+});
+
+// model to dashboard API endpoint
+app.get("/api/models", async (req, res) => {
+  try {
+    const result = await axios.get("http://localhost:11434/api/tags");
+    const models = result.data.models.map(m => m.name);
+    res.json({ models });
+  } catch (e) {
+    console.error("Error fetching models:", e);
+    res.status(500).json({ error: "Failed to fetch models" });
+  }
+});
+
+// ⭐⭐⭐ NEW MODEL CHAT ENDPOINT ⭐⭐⭐
+app.post("/model/:name", async (req, res) => {
+  try {
+    const modelName = req.params.name;
+    const userInput = req.body.input;
+
+    const messages = [
+      { role: "user", content: userInput }
+    ];
+
+    // Call Ollama directly using your existing function
+    const result = await callOllama(messages, modelName, null);
+
+    // Return the model's output
+    res.json({ output: result.message.content });
+  } catch (err) {
+    console.error("Model chat error:", err);
+    res.status(500).json({ error: "Model chat failed" });
+  }
+});
+
+// Return agent info (tools + profile pic)
+app.get("/api/agent/:name/info", (req, res) => {
+  const name = req.params.name;
+  const agent = agents[name];
+
+  if (!agent) {
+    return res.status(404).json({ error: "Agent not found" });
+  }
+
+  const toolNames = Object.keys(agent.tools || {});
+  const profilePic = agent.manifest.profilePic || "assets/agent_pics/default.png";
+
+  res.json({
+    tools: toolNames,
+    profilePic
+  });
+});
+
+// ⭐⭐⭐ END NEW MODEL CHAT ENDPOINT ⭐⭐⭐
+
+// ----------------------------------------TEST
+// Return an agent's tools to the dashboard
+app.get("/api/agent/:name/tools", (req, res) => {
+  const name = req.params.name;
+  const agent = agents[name];
+
+  if (!agent) {
+    return res.status(404).json({ error: "Agent not found" });
+  }
+
+  const toolNames = Object.keys(agent.tools || {});
+  res.json({ tools: toolNames });
+});
+// --------------------------TEST
+
 app.post("/agent/:name", async (req, res) => {
   const name = req.params.name;
   const agent = agents[name];
@@ -216,4 +355,5 @@ app.post("/agent/:name", async (req, res) => {
 });
 
 loadAgents();
+launchDashboard();
 app.listen(3928, () => console.log("h1v3 runtime listening on 3928"));
