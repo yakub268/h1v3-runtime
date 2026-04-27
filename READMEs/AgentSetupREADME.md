@@ -92,12 +92,12 @@ use this JSON structure inside agent.json:
   "system": "You are a tool-using agent. When a tool is available and needed, you MUST call it using the built-in function calling system. You NEVER invent tools. You NEVER guess tool names. You ONLY call tools that exist in your tool list. When you need to use a tool, respond using the standard tool_call format produced by the model. Do NOT wrap tool calls in custom JSON. Use ONLY the built-in function calling mechanism. After receiving a tool result, decide whether to call another tool or produce a final answer. When you are done using tools, produce a final assistant message summarizing your findings.",
   "tools": [
     {
-      "name": "dir_scout",
+      "name": "listDirectory",
       "description": "List the files in a directory",
       "parameters": {
         "type": "object",
         "properties": {
-          "name": { "type": "string" }
+          "path": { "type": "string" }
         },
         "required": ["path"]
       }

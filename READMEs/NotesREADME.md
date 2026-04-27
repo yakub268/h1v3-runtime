@@ -7,7 +7,7 @@ OK!
 
 The h1v3-runtime is a dual-folder framework with a built-in agent runtime and agent creation vault.
 
-- The ~/h1v3-runtime folder contains runtime.cjs, dashboard.js, index.html and style.css all handling the runtime and dashboard logic.
+- The ~/h1v3-runtime folder contains the runtime/ and dashboard/ subdirectories — runtime/ holds runtime.cjs and sessionManager.js (the runtime logic) and dashboard/ holds dashboard.js, index.html and style.css (the dashboard UI).
 
 - The ~/.h1v3 folder contains the agents, agent assets and tools folders (created by the user) and it handles the agents and tools logic:
 
@@ -28,7 +28,7 @@ n3z@n3z-laptop:~/h1v3-runtime$ tree -L 1
 ├── package-lock.json
 ├── README.md
 ├── READMEs
-└── runtime.cjs
+└── runtime
 
 // ------ ~/.h1v3 Folder Structure:
 // --------------------------------

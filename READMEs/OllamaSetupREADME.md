@@ -73,10 +73,23 @@ or just use nano or Vim or gedit like a monster..
 ====================================================================
 5. Install Git
 
+Git is required to clone the h1v3-runtime repository.
 
+Linux (Debian/Ubuntu):
 
+- sudo apt-get install -y git
 
+macOS (with Homebrew):
 
+- brew install git
+
+Windows:
+
+Download the installer from https://git-scm.com/download/win
+
+Verify installation with:
+
+- git --version
 
 
 ====================================================================
@@ -106,7 +119,7 @@ Run these commands for each model you want in your h1v3. Choose carefully.. its 
 Validated Models:
 - ollama pull qwen2.5:7b-instruct
 
-- ollama pull gemma4:e2b
+- ollama pull gemma3n:e2b
 
 - ollama pull llama3.1:8b
 
@@ -132,7 +145,7 @@ Before connecting Ollama to the h1v3-runtime, test each model directly:
 
 or run ..
 
-- ollama run gemma4:e2b
+- ollama run gemma3n:e2b
 
 or..
 

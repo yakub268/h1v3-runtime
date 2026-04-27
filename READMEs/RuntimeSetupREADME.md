@@ -27,7 +27,7 @@ The goal:
 
     Install dependencies
 
-    Create the hidden ~/.hive directory
+    Create the hidden ~/.h1v3 directory
 
     Verify everything works
 
@@ -56,7 +56,7 @@ Check your current Node version with:
 
 Next, download and run setup script:
 
-- curl -fsSL https://nodesource.com | sudo -E bash -
+- curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 
 
 Then for system-wide installation:
