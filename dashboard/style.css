@@ -1,3 +1,8 @@
+html, body {
+    height: auto;
+    overflow-y: auto;
+}
+
 body {
     background: #111;
     color: #eee;
@@ -8,6 +13,7 @@ body {
 
 #container {
     text-align: center;
+    min-height: 100vh; /* allow scrolling when content exceeds viewport */
 }
 
 #logo {
@@ -44,13 +50,16 @@ li {
     border-bottom: 1px solid #333;
 }
 
+
+
 /* --- Agent Subwindow Panel --- */
 
 #agent-panel {
     position: fixed;
-    top: 65%;   /* lower the panel, was 50% */
+    top: 70%;   /* lower the panel, was 50% */
     left: 75%;
-    transform: translate(-50%, -50%);
+    transform: none;    /* allow free movement (old code was) translate(-50%, -50%); */
+    cursor: grab;       /* visual cue */
     background: #111;
     border: 2px solid #00eaff;
     padding: 20px;
@@ -68,6 +77,13 @@ li {
     margin-top: 0;
     color: #00eaff;
     text-align: center;
+}
+
+/* Enable scrolling inside the agent subwindow */
+#agent-panel-content {
+    max-height: 70vh;      /* keeps the panel from growing too tall */
+    overflow-y: auto;      /* vertical scrollbar appears when needed */
+    padding-right: 10px;   /* prevents scrollbar from overlapping text */
 }
 
 #agent-status,
@@ -125,7 +141,7 @@ li {
     position: absolute;
     top: 8px;
     right: 10px;
-    background: #ff3b3b;
+    background: #de5009;
     color: #000;
     border: none;
     font-weight: bold;
@@ -140,13 +156,16 @@ li {
     background: #ff7070;
 }
 
+
+
 /* --- Model Subwindow Panel --- */
 
 #model-panel {
     position: fixed;
-    top: 65%; /* same lowered position as agent panel */
+    top: 70%; /* same lowered position as agent panel */
     left: 25%;
-    transform: translate(-50%, -50%);
+    transform: none;    /* allow free movement (old code was) translate(-50%, -50%); */
+    cursor: grab;       /* visual cue */
     background: #111;
     border: 2px solid #00eaff;
     padding: 20px;
@@ -160,6 +179,13 @@ li {
     margin-top: 0;
     color: #00eaff;
     text-align: center;
+}
+
+/* Enable scrolling inside the model subwindow */
+#model-panel-content {
+    max-height: 70vh;      /* keeps the panel from growing too tall */
+    overflow-y: auto;      /* vertical scrollbar appears when needed */
+    padding-right: 10px;   /* prevents scrollbar from overlapping text */
 }
 
 #model-status,
@@ -217,7 +243,7 @@ li {
     position: absolute;
     top: 8px;
     right: 10px;
-    background: #ff3b3b;
+    background: #de5009;
     color: #000;
     border: none;
     font-weight: bold;

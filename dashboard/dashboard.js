@@ -160,3 +160,38 @@ document.getElementById("model-close").addEventListener("click", () => {
     document.getElementById("model-response").textContent = "";
 });
 
+// --- Draggable Panel Logic ---
+function makePanelDraggable(panel) {
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    panel.addEventListener("mousedown", (e) => {
+        // Prevent dragging when clicking inside textareas or buttons
+        if (e.target.tagName === "TEXTAREA" || e.target.tagName === "BUTTON") return;
+
+        isDragging = true;
+        offsetX = e.clientX - panel.offsetLeft;
+        offsetY = e.clientY - panel.offsetTop;
+        panel.style.cursor = "grabbing";
+    });
+
+    document.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+
+        panel.style.left = `${e.clientX - offsetX}px`;
+        panel.style.top = `${e.clientY - offsetY}px`;
+    });
+
+    document.addEventListener("mouseup", () => {
+        isDragging = false;
+        panel.style.cursor = "default";
+    });
+}
+
+
+// --- Activate draggable panels ---
+window.addEventListener("DOMContentLoaded", () => {
+    makePanelDraggable(document.getElementById("agent-panel"));
+    makePanelDraggable(document.getElementById("model-panel"));
+});
