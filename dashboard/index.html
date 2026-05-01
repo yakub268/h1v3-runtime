@@ -6,28 +6,70 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <!-- ⭐ Vertical Sidebar -->
+    <div id="sidebar">
+        <div class="sidebar-tab" id="tab-memory">Memory</div>
+        <div class="sidebar-content hidden" id="memory-content">
+            <!-- ⭐ Global Memory Browser -->
+            <div id="memory-panel">
+                <!-- Agent Selector -->
+                <div id="memory-agent-selector">
+                    <label for="memory-agent-dropdown">Select Agent:</label>
+                    <select id="memory-agent-dropdown"></select>
+                </div>
+                <!-- 50/50 Split Pane -->
+                <div id="memory-split">
+                    <!-- LEFT: Session List -->
+                    <div id="memory-session-list">
+                        <h3>Sessions</h3>
+                        <div id="session-list-container"></div>
+                    </div>
+                    <!-- RIGHT: Session Viewer -->
+                    <div id="memory-session-viewer">
+                        <h3>Session Viewer</h3>
+                        <div id="session-viewer-content">
+                            <p class="session-viewer-placeholder">Select a session to view its contents.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-tab" id="tab-schedule">Schedule</div>
+        <div class="sidebar-content hidden" id="schedule-content">
+            <p class="sidebar-placeholder">Agent scheduling coming soon...</p>
+        </div>
+    </div>
+    <div id="sidebar-resizer"></div>
+
+
+    <!-- ⭐ Agent and Model Lists -->
     <div id="container">
         <img id="logo" src="h1v3-runtime_logo.png" alt="h1v3-runtime logo">
 
         <div id="columns">
             <div class="column">
-                <h2>Models</h2>
+                <!-- h2>Models</h2-->
+                 <h2 id="model-list-title">Models</h2>
                 <ul id="model-list"></ul>
             </div>
 
             <div class="column">
-                <h2>Agents</h2>
+                <!-- h2>Agents</h2-->
+                 <h2 id="agent-list-title">Agents</h2>
+
                 <ul id="agent-list"></ul>
             </div>
         </div>
     </div>
 
-    <!-- 🔥 NEW: Agent Subwindow Panel -->
+    <!-- 🔥 Agent Subwindow Panel -->
     <div id="agent-panel" class="hidden">
         <div id="agent-panel-content">
             <button id="agent-close">X</button>
 
-            <!-- ⭐ NEW: Agent Profile Picture -->
+            <!-- ⭐ Agent Profile Picture -->
             <img id="agent-profile-pic" class="profile-pic" src="" alt="Agent Profile">
 
             <h2 id="agent-panel-title"></h2>
@@ -42,7 +84,7 @@
         </div>
     </div>
 
-    <!-- 🔥 NEW: Model Subwindow Panel -->
+    <!-- 🔥 Model Subwindow Panel -->
     <div id="model-panel" class="hidden">
         <div id="model-panel-content">
             <button id="model-close">X</button>
@@ -61,3 +103,9 @@
     <script src="dashboard.js"></script>
 </body>
 </html>
+
+<!-- ⭐ Terminal Panel ⭐ -->
+<div id="terminal-container">
+    <div id="terminal-banner">H1V3-RT Terminal Output |:</div>
+    <div id="terminal"></div>
+</div>

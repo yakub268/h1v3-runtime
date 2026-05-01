@@ -37,7 +37,7 @@ body {
 
 h2 {
     margin-top: 0;
-    color: #00eaff;
+    /*color: rgb(0, 234, 255); /* main "Model" and "Agent" name color */
 }
 
 ul {
@@ -52,7 +52,13 @@ li {
 
 
 
+
 /* --- Agent Subwindow Panel --- */
+
+#agent-list-title {
+    color: rgb(255, 120, 0); /* amber/orange */
+}
+
 
 #agent-panel {
     position: fixed;
@@ -61,12 +67,12 @@ li {
     transform: none;    /* allow free movement (old code was) translate(-50%, -50%); */
     cursor: grab;       /* visual cue */
     background: #111;
-    border: 2px solid #00eaff;
+    border: 2px solid rgb(255, 120, 0); /*--------!!!!!!!!!!!!!------------*/
     padding: 20px;
     width: 420px;
     border-radius: 10px;
     z-index: 1000;
-    box-shadow: 0 0 20px rgba(0, 234, 255, 0.4);
+    box-shadow: 0 0 20px rgba(255, 119, 0, 0.4);
 }
 
 .hidden {
@@ -75,7 +81,7 @@ li {
 
 #agent-panel-content h2 {
     margin-top: 0;
-    color: #00eaff;
+    color: rgb(255, 120, 0);
     text-align: center;
 }
 
@@ -159,6 +165,11 @@ li {
 
 
 /* --- Model Subwindow Panel --- */
+
+#model-list-title {
+    color: rgb(0, 234, 255); /* cyan */
+}
+
 
 #model-panel {
     position: fixed;
@@ -258,6 +269,9 @@ li {
     background: #ff7070;
 }
 
+
+
+
 /* --- Agent Profile Picture (Large) --- */
 .profile-pic {
     width: 70px;
@@ -280,4 +294,297 @@ li {
     margin-right: 8px;
     vertical-align: middle;
     box-shadow: 0 0 6px rgba(0, 234, 255, 0.3);
+}
+
+
+
+
+/* Terminal Panel */
+#terminal-container {
+    background: #201e1e;
+    border: 1px solid #333;
+    padding: 10px;
+    height: 400px;
+    overflow-y: auto;
+    margin-top: -400px;
+    margin-left: 190px; /* shifted right by 190 pixels */
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+
+    width: 550px; /* ⭐ new width */
+}
+
+/* ⭐ Futuristic Banner */
+#terminal-banner {
+    background: linear-gradient(90deg, #0ff, rgb(255, 120, 0));
+    color: #000;
+    font-family: monospace;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-bottom: 2px solid #0ff;
+    text-shadow: 0 0 4px #0ff;
+    letter-spacing: 1px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    user-select: none;
+}
+
+#terminal {
+    padding: 10px;
+    color: rgb(255, 120, 0);
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.3em;
+    flex: 1;
+    overflow-y: auto;
+}
+
+
+
+
+/* ⭐ Vertical Sidebar */
+#sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 120px;
+    height: 100vh;
+    background: #111;
+    border-right: 2px solid #0ff;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    z-index: 5000;
+}
+
+/* ⭐ Sidebar Tabs */
+.sidebar-tab {
+    padding: 12px;
+    margin: 6px;
+    background: #1a1a1a;
+    color: rgb(0, 255, 0);
+    font-family: monospace;
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid rgb(0, 255, 0);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+
+    /* ⭐ Increase size here */
+    font-size: 30px;
+}
+
+.sidebar-tab:hover {
+    background: #0ff;
+    color: #000;
+    text-shadow: 0 0 4px #0ff;
+}
+
+/* ⭐ Expandable Content */
+.sidebar-content {
+    background: #151515;
+    border: 1px solid #0ff;
+    margin: 0 6px 6px 6px;
+    padding: 10px;
+    border-radius: 6px;
+    color: #0ff;
+    font-family: monospace;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Placeholder text */
+.sidebar-placeholder {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* Push main content right so sidebar doesn't overlap */
+#container, #columns, #agent-panel, #model-panel, #logo {
+    margin-left: 140px; /* adjust as needed */
+}
+
+
+/* ============================================================
+   ⭐ MEMORY TAB — GLOBAL MEMORY BROWSER
+   ============================================================ */
+
+/* Container for the entire memory panel */
+#memory-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px;
+    color: #0ff;
+    font-family: monospace;
+}
+
+/* Agent selector row */
+#memory-agent-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+}
+
+#memory-agent-selector label {
+    font-weight: bold;
+    color: #0ff;
+}
+
+#memory-agent-dropdown {
+    background: #111;
+    color: rgb(255, 120, 0);
+    border: 1px solid #0ff;
+    padding: 4px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* ============================================================
+   ⭐ 50/50 SPLIT PANE
+   ============================================================ */
+
+#memory-split {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 500px; /* fixed height inside sidebar */
+    border: 1px solid #0ff;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* LEFT PANE — Session List */
+#memory-session-list {
+    width: 50%;
+    background: #111;
+    border-right: 1px solid #0ff;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+#memory-session-list h3 {
+    margin-top: 0;
+    color: rgb(0, 255, 0);
+    text-align: center;
+}
+
+/* Session list entries */
+.session-entry {
+    background: #1a1a1a;
+    border: 1px solid #0ff;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+}
+
+.session-entry:hover {
+    background: #0ff;
+    color: #000;
+    cursor: pointer;
+}
+
+/* Buttons inside session entries ---------------------*/
+.session-btn {
+    background: rgb(0, 255, 0);
+    color: #000;
+    border: none;
+    padding: 4px 6px;
+    margin-right: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.session-btn:hover {
+    background: #00bcd4;
+}
+
+/* ============================================================
+   ⭐ RIGHT PANE — Session Viewer
+   ============================================================ */
+
+#memory-session-viewer {
+    width: 50%;
+    background: #111;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+#memory-session-viewer h3 {
+    margin-top: 0;
+    color: rgb(0, 255, 0);
+    text-align: center;
+}
+
+/* Viewer content */
+#session-viewer-content {
+    background: #1a1a1a;
+    border: 1px solid #0ff;
+    padding: 10px;
+    border-radius: 6px;
+    color: #0ff;
+
+    /* ⭐ NEW BEHAVIOR */
+    flex: 1;              /* fill vertical space inside the right pane */
+    /*overflow-y: auto;     /* vertical scroll if needed */
+    overflow-x: scroll;     /* ⭐ horizontal scroll enabled */
+    max-height: 100%;     /* prevents overflow beyond parent */
+    white-space: pre;     /* ⭐ preserve formatting, no wrapping */
+    font-family: monospace;
+}
+
+
+/* Placeholder text */
+.session-viewer-placeholder {
+    opacity: 0.6;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* ============================================================
+   ⭐ DRAGGABLE SIDEBAR RESIZER
+   ============================================================ */
+
+#sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 180px; /* increased default width */
+    height: 100vh;
+    background: #111;
+    border-right: 2px solid #0ff;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    z-index: 5000;
+}
+
+/* The draggable vertical bar */
+#sidebar-resizer {
+    position: fixed;
+    left: 180px; /* matches sidebar width */
+    top: 0;
+    width: 6px;
+    height: 100vh;
+    cursor: ew-resize;
+    background: rgba(0, 255, 255, 0.15);
+    z-index: 5001;
+}
+
+#sidebar-resizer:hover {
+    background: rgba(0, 255, 255, 0.35);
+}
+
+/* Shift main content based on sidebar width */
+#container, #columns, #agent-panel, #model-panel, #logo, #terminal-container {
+    transition: margin-left 0.1s linear;
 }

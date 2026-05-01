@@ -1,9 +1,22 @@
 
-                            // --- Note on h1v3-runtime --- //
+            // -------------------------------------------------- //
+            // --- h1v3-runtime Agent-Runtime Folder Overview --- //
+            // -------------------------------------------------- //
 
-OK! So the h1v3-runtime is actually a dual folder architecture, with the ~/h1v3-runtime folder (created by the user) containing runtime.cjs, dashboard.js, index.html, and the style.css and the ~/.h1v3 folder containing the agents and tools. Here is the structure of the ~/h1v3-runtime folder with the dashboard.js, index.html, and style.css living in the dashboard folder:
+OK!
 
-username:~/h1v3-runtime$ tree -L 1
+The h1v3-runtime is a dual-folder framework with a built-in agent runtime and agent creation vault.
+
+- The ~/h1v3-runtime folder contains runtime.cjs, dashboard.js, index.html and style.css all handling the runtime and dashboard logic.
+
+- The ~/.h1v3 folder contains the agents, agent assets and tools folders (created by the user) and it handles the agents and tools logic:
+
+
+
+// ------ ~/h1v3-runtime Folder Structure:
+// ---------------------------------------
+
+n3z@n3z-laptop:~/h1v3-runtime$ tree -L 1
 .
 ├── dashboard
 ├── h1v3-runtime_agent_structure.png
@@ -17,9 +30,10 @@ username:~/h1v3-runtime$ tree -L 1
 ├── READMEs
 └── runtime.cjs
 
-And here is the folder structure of the ~/.h1v3 folder:
+// ------ ~/.h1v3 Folder Structure:
+// --------------------------------
 
-username:~/.h1v3$ tree -L 4
+n3z@n3z-laptop:~/.h1v3$ tree -L 4
 .
 ├── agents
 │   ├── cron_manager
@@ -85,4 +99,3 @@ username:~/.h1v3$ tree -L 4
     ├── info
     └── templates
         └── agent_json_template.md
-
