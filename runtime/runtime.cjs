@@ -1,3 +1,6 @@
+//==============================================================================================//
+//                              H1V3-RUNTIME  MAIN CODE                                         //
+//==============================================================================================//
 
 
 const express = require("express");
@@ -8,14 +11,17 @@ const chokidar = require("chokidar");
 const AGENT_ROOT = path.join(process.env.HOME || process.env.HOMEPATH || ".", ".h1v3", "agents");
 const app = express();
 
+
+
 const logSubscribers = [];
-const logBuffer = []; // ⭐ store last 200 log lines
+const logBuffer = []; // store last 200 log lines
 const originalLog = console.log;
-//===============================================================================================
+//===================================================
 
 
 
-// --- ⭐ --- Logging Sub-System --- ⭐ --- //
+
+//----------⭐Logging Sub-System
 function broadcastToDashboard(msg) {
   for (const client of logSubscribers) {
     client.write(`data: ${msg}\n\n`);
@@ -23,7 +29,7 @@ function broadcastToDashboard(msg) {
 }
 
 
-// --- ⭐ --- Save & Broadcast --- ⭐ --- //
+//----------⭐Save & Broadcast
 console.log = function (...args) {
   const msg = args.join(" ");
   originalLog(msg);
@@ -37,12 +43,15 @@ console.log = function (...args) {
 };
 
 
-// --- ⭐ --- Serve static assets (agent pics, etc.) --- ⭐ --- //
+//----------⭐Serve static assets (agent pics, etc.)
 app.use("/assets", express.static(path.join(process.env.HOME, ".h1v3/assets")));
 app.use(express.json());
 
 
-// --- ⭐ --- Allow dashboard (3030) to call runtime API (3928) --- ⭐ --- //
+
+
+
+//----------⭐Allow dashboard (3030) to call runtime API (3928)
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "http://localhost:3030");
   res.header("Access-Control-Allow-Methods", "GET,POST");
@@ -53,7 +62,32 @@ app.use((req, res, next) => {
 let agents = {};
 
 
-// --- ⭐ --- Launch Dashboard Server --- ⭐ --- //
+
+
+// ⭐ Model Metadata Registry
+const models = {
+    "moondream:latest": {
+        profilePic: "/assets/model_pics/moondream.png",
+        info: "Moondream Vision Model (1.7 GB)"
+    },
+    "qwen2.5:7b-instruct": {
+        profilePic: "/assets/model_pics/qwen2.5_7b.png",
+        info: "Qwen 2.5, 7B Instruct (4.7 GB)"
+    },
+    "llama3.1:8b": {
+        profilePic: "/assets/model_pics/llama3.1_8b.png",
+        info: "Meta LLaMA 3.1, 8B (4.9 GB)"
+    },
+    "gemma4:e2b": {
+        profilePic: "/assets/model_pics/gemma4_e2b.png",
+        info: "Gemma 4, E2B Edition (7.2 GB)"
+    }
+};
+
+
+
+
+//----------⭐Launch Dashboard Server
 function launchDashboard() {
   const http = require("http");
   const { spawn } = require("child_process");
@@ -120,27 +154,21 @@ console.log("DashboardDir:", dashboardDir);
 }
 
 
-// --- ⭐ --- Load ALL agents from ~/.h1v3/agents --- ⭐ --- //
+//----------⭐Load ALL agents from ~/.h1v3/agents
 function loadAgents() {
   agents = {};
   if (!fs.existsSync(AGENT_ROOT)) return;
-
   const agentNames = fs.readdirSync(AGENT_ROOT);
   for (const name of agentNames) {
     const agentDir = path.join(AGENT_ROOT, name);
     const manifestPath = path.join(agentDir, "agent.json");
     const agentFile = path.join(agentDir, "agent.js");
     const toolsDir = path.join(agentDir, "tools");
-
     if (!fs.existsSync(manifestPath) || !fs.existsSync(agentFile)) continue;
-
     const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-
     // Ensure tools is always an array (schema for Ollama)
     manifest.tools = Array.isArray(manifest.tools) ? manifest.tools : [];
-
     const agent = require(agentFile);
-
     // Load JS tool implementations
     let tools = {};
     if (fs.existsSync(toolsDir)) {
@@ -151,19 +179,14 @@ function loadAgents() {
         tools[toolName] = require(path.join(toolsDir, f));
       }
     }
-
     agents[name] = { manifest, agent, tools };
     console.log(`Loaded Agent: ${name}`);
   }
-
-
   console.log("// --- Agent Swarm Initialized.. --- //");
-
-
 }
 
 
-//--- ⭐ --- Watch for changes and hot‑reload --- ⭐ --- //
+//----------⭐Watch for changes and hot‑reload
 chokidar
   .watch([
     path.join(AGENT_ROOT, "**/agent.json"),
@@ -180,7 +203,7 @@ chokidar
   });
 
 
-// --- ⭐ --- Wrap tools in OpenAI/Ollama function schema --- ⭐ --- //
+//----------⭐Wrap tools in OpenAI/Ollama function schema
 function formatTools(tools) {
   if (!tools || !Array.isArray(tools)) return [];
 
@@ -199,7 +222,7 @@ function formatTools(tools) {
 }
 
 
-// --- ⭐ --- Call Ollama chat API --- ⭐ --- //
+//----------⭐Call Ollama chat API
 async function callOllama(messages, model, toolSchema) {
   const body = {
     model,
@@ -216,7 +239,7 @@ async function callOllama(messages, model, toolSchema) {
 }
 
 
-// --- ⭐ --- Extract first JSON Object from mixed-text (Gemma‑style fallback) --- ⭐ --- //
+//----------⭐Extract first JSON Object from mixed-text (Gemma‑style fallback)
 function extractJSON(text) {
   if (!text || typeof text !== "string") return null;
   const match = text.match(/\{[\s\S]*\}/);
@@ -229,7 +252,7 @@ function extractJSON(text) {
 }
 
 
-// --- ⭐ --- Session Metadata (index.json) --- ⭐ --- //
+//----------⭐Session Metadata (index.json)
 function getIndexPath(agentName) {
   return path.join(AGENT_ROOT, agentName, "sessions", "index.json");
 }
@@ -254,7 +277,7 @@ function saveIndex(agentName, indexObj) {
 }
 
 
-// --- ⭐ --- SSE (Server‑Sent Events) TERMINAL LOG-STREAM Endpoint --- ⭐ --- //
+//----------⭐SSE (Server‑Sent Events) TERMINAL LOG-STREAM Endpoint
 app.get("/logs", (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
@@ -280,13 +303,15 @@ app.get("/logs", (req, res) => {
 console.log("// --- SSE Endpoint Initialized.. --- //");
 
 
-// ---   ⭐   ---   Agent to Dashboard API Endpoint   ---   ⭐   --- //
+//----------⭐Agent to Dashboard API Endpoint
 app.get("/api/agents", (req, res) => {
   res.json({ agents: Object.keys(agents) });
 });
 
 
-// --- ⭐ --- Model to Dashboard API Endpoint --- ⭐ --- //
+
+
+//----------⭐Model to Dashboard API Endpoint
 app.get("/api/models", async (req, res) => {
   try {
     const result = await axios.get("http://localhost:11434/api/tags");
@@ -299,7 +324,28 @@ app.get("/api/models", async (req, res) => {
 });
 
 
-// --- ⭐ --- Model Chat Endpoint --- ⭐ --- //
+
+
+// ⭐ NEW: Model Info Endpoint
+app.get("/api/model/:name/info", (req, res) => {
+    const name = req.params.name;
+    const model = models[name];
+
+    if (!model) {
+        return res.status(404).json({ error: "Model not found" });
+    }
+
+    res.json({
+        status: "Loaded",
+        profilePic: model.profilePic || "assets/model_pics/default.png",
+        info: model.info || "No additional info"
+    });
+});
+
+
+
+
+//----------⭐Model Chat Endpoint
 app.post("/model/:name", async (req, res) => {
   try {
     const modelName = req.params.name;
@@ -321,7 +367,7 @@ app.post("/model/:name", async (req, res) => {
 });
 
 
-// --- ⭐ --- Return Agent Info (tools + profile pic) --- ⭐ --- //
+//----------⭐Return Agent Info (tools + profile pic)
 app.get("/api/agent/:name/info", (req, res) => {
   const name = req.params.name;
   const agent = agents[name];
@@ -340,7 +386,7 @@ app.get("/api/agent/:name/info", (req, res) => {
 });
 
 
-// --- ⭐ --- Return an agent's tools to the dashboard --- ⭐ --- //
+//----------⭐Return an agent's tools to the dashboard
 app.get("/api/agent/:name/tools", (req, res) => {
   const name = req.params.name;
   const agent = agents[name];
@@ -354,7 +400,9 @@ app.get("/api/agent/:name/tools", (req, res) => {
 });
 
 
-// --- ⭐ --- Agent Execution Endpoint (with persistent memory !! ) --- ⭐ --- //
+
+
+//----------⭐Agent Execution Endpoint (with persistent memory !! )
 app.post("/agent/:name", async (req, res) => {
   const name = req.params.name;
   const agent = agents[name];
@@ -511,7 +559,7 @@ app.post("/agent/:name", async (req, res) => {
 });
 
 
-// --- ⭐ --- Session Listing Endpoint --- ⭐ --- //
+//----------⭐Session Listing Endpoint
 app.get("/api/agent/:name/sessions", (req, res) => {
   const agentName = req.params.name;
   const sessionDir = path.join(AGENT_ROOT, agentName, "sessions");
@@ -545,7 +593,7 @@ app.get("/api/agent/:name/sessions", (req, res) => {
   res.json(sessions);
 });
 
-// --- ⭐ --- Get Full Session --- ⭐ --- //
+//----------⭐Get Full Session
 app.get("/api/agent/:name/session/:id", (req, res) => {
   const agentName = req.params.name;
   const sessionId = req.params.id;
@@ -565,7 +613,7 @@ app.get("/api/agent/:name/session/:id", (req, res) => {
   });
 });
 
-// --- ⭐ --- Rename Session (metadata only)--- ⭐ --- //
+//----------⭐Rename Session (metadata only)
 app.post("/api/agent/:name/session/:id/rename", (req, res) => {
   const agentName = req.params.name;
   const sessionId = req.params.id;
@@ -595,7 +643,7 @@ app.post("/api/agent/:name/session/:id/rename", (req, res) => {
   res.json({ success: true });
 });
 
-// --- ⭐ --- Delete Session --- ⭐ --- //
+//----------⭐Delete Session
 app.delete("/api/agent/:name/session/:id", (req, res) => {
   const agentName = req.params.name;
   const sessionId = req.params.id;

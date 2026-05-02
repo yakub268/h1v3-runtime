@@ -1,3 +1,9 @@
+//==============================================================================================//
+//                              H1V3-RUNTIME  DASHBOARD CODE                                    //
+//==============================================================================================//
+
+
+//----------⭐Persistent session ID for agent conversations
 async function loadDashboard() {
     try {
         // Fetch live models
@@ -45,16 +51,14 @@ async function loadDashboard() {
             `<li style="color:red;">Failed to load agents</li>`;
     }
 }
-
-
-
 loadDashboard();
 
-// ⭐ Persistent session ID for agent conversations
+
+//----------⭐Persistent session ID for agent conversations
 let currentSessionId = null;
 
 
-// --- Agent Subwindow Logic ---
+//----------⭐Agent Subwindow Logic
 function openAgentPanel(agentName) {
     const panel = document.getElementById("agent-panel");
     const title = document.getElementById("agent-panel-title");
@@ -132,20 +136,42 @@ function openAgentPanel(agentName) {
             </div>
         `;
             };
-        }
+}
 
-// --- Model Subwindow Logic ---
+
+//----------⭐Model Subwindow Logic
 function openModelPanel(modelName) {
     const panel = document.getElementById("model-panel");
     const title = document.getElementById("model-panel-title");
     const status = document.getElementById("model-status");
     const info = document.getElementById("model-info");
+    const pic = document.getElementById("model-profile-pic");
 
     title.textContent = modelName;
 
-    // Placeholder values — we can wire these to live model metadata later
-    status.innerHTML = `<b>Status:</b> Loaded`;
-    info.innerHTML = `<b>Info:</b> (coming soon)`;
+    // ⭐ Fetch model info (status + profile pic + metadata)
+    fetch(`http://localhost:3928/api/model/${modelName}/info`)
+        .then(res => res.json())
+        .then(data => {
+            status.innerHTML = `<b>Status:</b> ${data.status || "Loaded"}`;
+            info.innerHTML = `<b>Info:</b> ${data.info || "(none)"}`;
+
+            // ⭐ Profile picture
+            if (data.profilePic) {
+                pic.src = data.profilePic;
+                pic.style.display = "block";
+            } else {
+                pic.src = "/assets/model_pics/default.png";
+                pic.style.display = "block";
+            }
+        })
+        .catch(err => {
+            console.error("Error fetching model info:", err);
+            status.innerHTML = `<b>Status:</b> Error`;
+            info.innerHTML = `<b>Info:</b> Could not load metadata`;
+            pic.src = "/assets/model_pics/default.png";
+            pic.style.display = "block";
+        });
 
     panel.classList.remove("hidden");
 
@@ -160,11 +186,20 @@ function openModelPanel(modelName) {
         });
 
         const data = await res.json();
-        responseBox.textContent = data.output;
+
+        // ⭐ Show avatar next to model response
+        responseBox.innerHTML = `
+            <div class="agent-message">
+                <img src="${pic.src}" class="profile-pic-small">
+                <span>${data.output}</span>
+            </div>
+        `;
     };
 }
 
-// Close button handler for Agent Subwindow
+
+
+//----------⭐Close button handler for Agent Subwindow
 document.getElementById("agent-close").addEventListener("click", () => {
     document.getElementById("agent-panel").classList.add("hidden");
     document.getElementById("agent-input").value = "";
@@ -172,14 +207,16 @@ document.getElementById("agent-close").addEventListener("click", () => {
     currentSessionId = null; // ⭐ Reset session
 });
 
-// Close button handler for Model Subwindow
+
+//----------⭐Close button handler for Model Subwindow
 document.getElementById("model-close").addEventListener("click", () => {
     document.getElementById("model-panel").classList.add("hidden");
     document.getElementById("model-input").value = "";
     document.getElementById("model-response").textContent = "";
 });
 
-// --- Draggable Panel Logic ---
+
+//----------⭐Draggable Panel Logic
 function makePanelDraggable(panel) {
     let isDragging = false;
     let offsetX = 0;
@@ -208,13 +245,15 @@ function makePanelDraggable(panel) {
     });
 }
 
-// --- Activate draggable panels ---
+
+//----------⭐Activate draggable panels
 window.addEventListener("DOMContentLoaded", () => {
     makePanelDraggable(document.getElementById("agent-panel"));
     makePanelDraggable(document.getElementById("model-panel"));
 });
 
-// ⭐ LIVE LOG STREAM FROM RUNTIME ⭐
+
+//----------⭐LIVE LOG STREAM FROM RUNTIME
 function startLogStream() {
     const terminal = document.getElementById("terminal");
     const eventSource = new EventSource("http://localhost:3928/logs");
@@ -229,28 +268,28 @@ function startLogStream() {
     };
 }
 
-// Start the log stream when dashboard loads
+
+//----------⭐Start the log stream when dashboard loads
 window.addEventListener("DOMContentLoaded", () => {
     startLogStream();
 });
 
 
-// ⭐ Sidebar Toggle Logic
+//----------⭐Sidebar Memory Toggle Logic
 document.getElementById("tab-memory").addEventListener("click", () => {
     document.getElementById("memory-content").classList.toggle("hidden");
 });
 
+
+//----------⭐Sidebar Schedule Toggle Logic
 document.getElementById("tab-schedule").addEventListener("click", () => {
     document.getElementById("schedule-content").classList.toggle("hidden");
 });
 
 
-/* ============================================================
-   ⭐ MEMORY TAB — GLOBAL MEMORY BROWSER JS
-   ============================================================ */
-
-// When Memory tab is opened, load agent list into dropdown
+//----------⭐MEMORY TAB — GLOBAL MEMORY BROWSER JS
 document.getElementById("tab-memory").addEventListener("click", async () => {
+    // When Memory tab is opened, load agent list into dropdown
     const dropdown = document.getElementById("memory-agent-dropdown");
 
     // If already populated, do nothing
@@ -274,9 +313,7 @@ document.getElementById("tab-memory").addEventListener("click", async () => {
 });
 
 
-// ============================================================
-// ⭐ Load Sessions for Selected Agent
-// ============================================================
+//----------⭐Load Sessions for Selected Agent
 async function loadSessionsForAgent(agentName) {
     const container = document.getElementById("session-list-container");
     container.innerHTML = `<p>Loading sessions...</p>`;
@@ -334,9 +371,7 @@ async function loadSessionsForAgent(agentName) {
 }
 
 
-// ============================================================
-// ⭐ Load Session Viewer
-// ============================================================
+//----------⭐Load Session Viewer
 async function loadSessionViewer(agentName, sessionId) {
     const viewer = document.getElementById("session-viewer-content");
     viewer.innerHTML = `<p>Loading session...</p>`;
@@ -365,9 +400,7 @@ async function loadSessionViewer(agentName, sessionId) {
 }
 
 
-// ============================================================
-// ⭐ Rename Session
-// ============================================================
+//----------⭐Rename Session
 async function renameSession(agentName, sessionId) {
     const newName = prompt("Enter new session name:");
 
@@ -383,9 +416,7 @@ async function renameSession(agentName, sessionId) {
 }
 
 
-// ============================================================
-// ⭐ Delete Session
-// ============================================================
+//----------⭐Delete Session
 async function deleteSession(agentName, sessionId) {
     if (!confirm("Delete this session?")) return;
 
@@ -401,9 +432,7 @@ async function deleteSession(agentName, sessionId) {
 }
 
 
-// ============================================================
-// ⭐ Export Session
-// ============================================================
+//----------⭐Export Session
 async function exportSession(agentName, sessionId) {
     const res = await fetch(`http://localhost:3928/api/agent/${agentName}/session/${sessionId}`);
     const data = await res.json();
@@ -420,11 +449,7 @@ async function exportSession(agentName, sessionId) {
 }
 
 
-
-/* ============================================================
-   ⭐ DRAGGABLE SIDEBAR LOGIC
-   ============================================================ */
-
+//----------⭐DRAGGABLE SIDEBAR LOGIC
 (function enableSidebarResize() {
     const sidebar = document.getElementById("sidebar");
     const resizer = document.getElementById("sidebar-resizer");

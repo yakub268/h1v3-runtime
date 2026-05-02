@@ -1,9 +1,16 @@
+//==============================================================================================//
+//                              H1V3-RUNTIME  SESSION MANAGER CODE                              //
+//==============================================================================================//
+
+
 const fs = require("fs");
 const path = require("path");
 const AGENT_ROOT = path.join(process.env.HOME || process.env.HOMEPATH || ".", ".h1v3", "agents");
 
 
-// --- ⭐ --- Session Metadata (index.json) --- ⭐ --- //
+
+
+//----------⭐Session Metadata (index.json)
 function getIndexPath(agentName) {
   return path.join(AGENT_ROOT, agentName, "sessions", "index.json");
 }
@@ -28,13 +35,13 @@ function saveIndex(agentName, indexObj) {
 }
 
 
-// --- ⭐ --- Session Filepath --- ⭐ --- //
+//----------⭐Session Filepath
 function sessionPath(agentName, sessionId) {
   return path.join(AGENT_ROOT, agentName, "sessions", `${sessionId}.json`);
 }
 
 
-// --- ⭐ --- Load Session --- ⭐ --- //
+//----------⭐Load Session
 function loadSession(agentName, sessionId) {
   const p = sessionPath(agentName, sessionId);
 
@@ -69,7 +76,7 @@ function loadSession(agentName, sessionId) {
 }
 
 
-// --- ⭐ --- Save Session + Metadata --- ⭐ --- //
+//----------⭐Save Session + Metadata
 function saveSession(agentName, session) {
   const p = sessionPath(agentName, session.sessionId);
   const dir = path.dirname(p);
@@ -102,6 +109,7 @@ function saveSession(agentName, session) {
   // Save metadata index
   saveIndex(agentName, index);
 }
+
 
 module.exports = {
   loadSession,

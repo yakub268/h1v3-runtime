@@ -1,3 +1,6 @@
+
+/* ================================================== STYLE FOR H1V3-RT DASHBOARD GUI ================================================== */
+
 html, body {
     height: auto;
     overflow-y: auto;
@@ -50,15 +53,10 @@ li {
     border-bottom: 1px solid #333;
 }
 
-
-
-
 /* --- Agent Subwindow Panel --- */
-
 #agent-list-title {
     color: rgb(255, 120, 0); /* amber/orange */
 }
-
 
 #agent-panel {
     position: fixed;
@@ -162,14 +160,10 @@ li {
     background: #ff7070;
 }
 
-
-
 /* --- Model Subwindow Panel --- */
-
 #model-list-title {
     color: rgb(0, 234, 255); /* cyan */
 }
-
 
 #model-panel {
     position: fixed;
@@ -269,9 +263,6 @@ li {
     background: #ff7070;
 }
 
-
-
-
 /* --- Agent Profile Picture (Large) --- */
 .profile-pic {
     width: 70px;
@@ -295,9 +286,6 @@ li {
     vertical-align: middle;
     box-shadow: 0 0 6px rgba(0, 234, 255, 0.3);
 }
-
-
-
 
 /* Terminal Panel */
 #terminal-container {
@@ -340,9 +328,6 @@ li {
     flex: 1;
     overflow-y: auto;
 }
-
-
-
 
 /* ⭐ Vertical Sidebar */
 #sidebar {
@@ -409,12 +394,7 @@ li {
     margin-left: 140px; /* adjust as needed */
 }
 
-
-/* ============================================================
-   ⭐ MEMORY TAB — GLOBAL MEMORY BROWSER
-   ============================================================ */
-
-/* Container for the entire memory panel */
+/* ⭐ MEMORY TAB — GLOBAL MEMORY BROWSER (Container for the entire memory panel) */
 #memory-panel {
     display: flex;
     flex-direction: column;
@@ -446,10 +426,7 @@ li {
     cursor: pointer;
 }
 
-/* ============================================================
-   ⭐ 50/50 SPLIT PANE
-   ============================================================ */
-
+/* ⭐ 50/50 SPLIT PANE */
 #memory-split {
     display: flex;
     flex-direction: row;
@@ -490,7 +467,7 @@ li {
     cursor: pointer;
 }
 
-/* Buttons inside session entries ---------------------*/
+/* Buttons inside session entries */
 .session-btn {
     background: rgb(0, 255, 0);
     color: #000;
@@ -507,10 +484,7 @@ li {
     background: #00bcd4;
 }
 
-/* ============================================================
-   ⭐ RIGHT PANE — Session Viewer
-   ============================================================ */
-
+/* ⭐ RIGHT PANE — Session Viewer */
 #memory-session-viewer {
     width: 50%;
     background: #111;
@@ -541,7 +515,6 @@ li {
     font-family: monospace;
 }
 
-
 /* Placeholder text */
 .session-viewer-placeholder {
     opacity: 0.6;
@@ -550,10 +523,7 @@ li {
     margin-top: 20px;
 }
 
-/* ============================================================
-   ⭐ DRAGGABLE SIDEBAR RESIZER
-   ============================================================ */
-
+/* ⭐ DRAGGABLE SIDEBAR RESIZER */
 #sidebar {
     position: fixed;
     left: 0;
