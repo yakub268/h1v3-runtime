@@ -3,16 +3,13 @@
 //==============================================================================================//
 
 
-const express = require("express");
+const express = require("express"); // import Express.js for Server
 const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
 const chokidar = require("chokidar");
 const AGENT_ROOT = path.join(process.env.HOME || process.env.HOMEPATH || ".", ".h1v3", "agents");
 const app = express();
-
-
-
 const logSubscribers = [];
 const logBuffer = []; // store last 200 log lines
 const originalLog = console.log;
@@ -48,23 +45,21 @@ app.use("/assets", express.static(path.join(process.env.HOME, ".h1v3/assets")));
 app.use(express.json());
 
 
-
-
-
-//----------⭐Allow dashboard (3030) to call runtime API (3928)
+//----------⭐(CORS middleware) Allow dashboard (3030) to call runtime API (3928)
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "http://localhost:3030");
-  res.header("Access-Control-Allow-Methods", "GET,POST");
+  res.header("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type");
   res.header("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
   next();
 });
 let agents = {};
 
 
-
-
-// ⭐ Model Metadata Registry
+// ⭐ Model Metadata Registry (Profile Pic etc)
 const models = {
     "moondream:latest": {
         profilePic: "/assets/model_pics/moondream.png",
@@ -83,8 +78,6 @@ const models = {
         info: "Gemma 4, E2B Edition (7.2 GB)"
     }
 };
-
-
 
 
 //----------⭐Launch Dashboard Server
@@ -324,8 +317,6 @@ app.get("/api/models", async (req, res) => {
 });
 
 
-
-
 // ⭐ NEW: Model Info Endpoint
 app.get("/api/model/:name/info", (req, res) => {
     const name = req.params.name;
@@ -343,6 +334,68 @@ app.get("/api/model/:name/info", (req, res) => {
 });
 
 
+//----------⭐System Metrics Endpoint
+app.get("/api/metrics", (req, res) => {
+  const os = require("os");
+  const { execSync } = require("child_process");
+
+  try {
+    // CPU usage (simplified: average load)
+    const loadAvg = os.loadavg()[0]; // 1-minute load average
+    const cpuCount = os.cpus().length;
+    const cpuPercent = Math.min(100, Math.round((loadAvg / cpuCount) * 100));
+
+    // RAM
+    const totalMem = Math.round(os.totalmem() / (1024 * 1024 * 1024)); // GB
+    const freeMem = Math.round(os.freemem() / (1024 * 1024 * 1024)); // GB
+    const usedMem = totalMem - freeMem;
+
+    // Disk (simplified: root filesystem)
+    let diskUsed = 0;
+    let diskTotal = 0;
+    try {
+      const dfOutput = execSync("df / | tail -1", { encoding: "utf8" });
+      const parts = dfOutput.trim().split(/\s+/);
+      diskUsed = Math.round(parseInt(parts[2]) / (1024 * 1024)); // GB
+      diskTotal = Math.round(parseInt(parts[1]) / (1024 * 1024)); // GB
+    } catch (e) {
+      // Fallback if df fails
+      diskUsed = 0;
+      diskTotal = 512; // placeholder
+    }
+
+    // GPU (NVIDIA only, placeholder if not available)
+    let gpuPercent = 0;
+    try {
+      const nvidiaOutput = execSync("nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits", { encoding: "utf8" });
+      gpuPercent = parseInt(nvidiaOutput.trim().split('\n')[0]) || 0;
+    } catch (e) {
+      // No NVIDIA GPU or nvidia-smi not available
+      gpuPercent = 0;
+    }
+
+    // VRAM (placeholder, would need more complex parsing)
+    const vramUsed = 0; // Placeholder
+    const vramTotal = 8; // Placeholder
+
+    // Network (simplified, placeholder)
+    const netDown = 0; // MB/s
+    const netUp = 0; // MB/s
+
+    res.json({
+      cpu: cpuPercent,
+      gpu: gpuPercent,
+      ram: { used: usedMem, total: totalMem },
+      vram: { used: vramUsed, total: vramTotal },
+      disk: { used: diskUsed, total: diskTotal },
+      network: { down: netDown, up: netUp }
+    });
+
+  } catch (err) {
+    console.error("Error fetching metrics:", err);
+    res.status(500).json({ error: "Failed to fetch metrics" });
+  }
+});
 
 
 //----------⭐Model Chat Endpoint
@@ -358,13 +411,26 @@ app.post("/model/:name", async (req, res) => {
     // Call Ollama directly using your existing function
     const result = await callOllama(messages, modelName, null);
 
-    // Return the model's output
-    res.json({ output: result.message.content });
+    // ⭐ Compute tokens/sec (basic per-generation metric)
+    let tokensPerSecond = null;
+
+    if (result.eval_count && result.eval_duration) {
+      const seconds = result.eval_duration / 1e9; // convert ns → seconds
+      tokensPerSecond = (result.eval_count / seconds).toFixed(2);
+    }
+
+    // Return the model's output + TPS
+    res.json({
+      output: result.message.content,
+      tokensPerSecond
+    });
+
   } catch (err) {
     console.error("Model chat error:", err);
     res.status(500).json({ error: "Model chat failed" });
   }
 });
+
 
 
 //----------⭐Return Agent Info (tools + profile pic)
@@ -404,52 +470,58 @@ app.get("/api/agent/:name/tools", (req, res) => {
 
 //----------⭐Agent Execution Endpoint (with persistent memory !! )
 app.post("/agent/:name", async (req, res) => {
+  
+
+  const taskStart = Date.now(); // NEW TEST CODE
+
+
   const name = req.params.name;
   const agent = agents[name];
   if (!agent) return res.status(404).json({ error: "Agent not found" });
-
   const model = agent.manifest.model;
-
   // --- Load or create session ---
   const { sessionId } = req.body;
   const sid = sessionId || Date.now().toString();
-
   const { loadSession, saveSession } = require("./sessionManager");
   let session = loadSession(name, sid);
   let messages = session.messages;
-
   // Inject system prompt if this is a new session
   if (messages.length === 0) {
     messages.push({ role: "system", content: agent.manifest.system || "" });
   }
-  
   console.log(`🧠 Loaded memory for session ${sessionId} (${messages.length} messages)`);
-
   // Add the new user message
   messages.push({ role: "user", content: req.body.input || "" });
-
-
-
   // Persist immediately
   session.messages = messages;
   saveSession(name, session);
   console.log(`💾 Saved memory for session ${sessionId}`);
 
-
   try {
+    let tokensPerSecond = null;
+    
     while (true) {
+      
       const response = await callOllama(messages, model, agent.manifest.tools);
       const msg = response.message || {};
+
+
+
+      // ⭐ Capture TPS from this model call--------NEW TEST CODE
+      if (response.eval_count && response.eval_duration) {
+          const seconds = response.eval_duration / 1e9;
+          tokensPerSecond = (response.eval_count / seconds).toFixed(2);
+      }
+      
+
 
       // --- 1. Llama 3.1 / Ollama tool_calls path ---
       const toolCalls = msg.tool_calls || msg.toolCalls;
       if (toolCalls && toolCalls.length > 0) {
         const call = toolCalls[0];
-
         const fn = call.function || {};
         const toolName = fn.name;
         let args = fn.arguments || {};
-
         if (typeof args === "string") {
           try {
             args = JSON.parse(args);
@@ -457,43 +529,34 @@ app.post("/agent/:name", async (req, res) => {
             // leave as string if parsing fails
           }
         }
-
         const toolImpl = agent.tools[toolName];
         if (!toolImpl) {
           messages.push({
             role: "assistant",
             content: `Tool ${toolName} not found. Available tools: ${Object.keys(agent.tools).join(", ")}`,
           });
-
           // Persist
           session.messages = messages;
           saveSession(name, session);
-
           continue;
         }
-
         console.log(`🐝 h1v3 TOOL INVOKED → ${toolName}`);
-
         const result = await toolImpl.run(args);
-
         // Record the tool call
         messages.push({
           role: "assistant",
           content: "",
           tool_calls: [call],
         });
-
         // Record the tool result
         messages.push({
           role: "tool",
           name: toolName,
           content: JSON.stringify(result),
         });
-
         // Persist after tool result
         session.messages = messages;
         saveSession(name, session);
-
         continue;
       }
 
@@ -503,57 +566,51 @@ app.post("/agent/:name", async (req, res) => {
         const toolName = extracted.tool;
         const args = extracted.arguments || {};
         const toolImpl = agent.tools[toolName];
-
         if (!toolImpl) {
           messages.push({
             role: "assistant",
             content: `Tool ${toolName} not found. Available tools: ${Object.keys(agent.tools).join(", ")}`,
           });
-
           session.messages = messages;
           saveSession(name, session);
-
           continue;
         }
-
         const result = await toolImpl.run(args);
-
         messages.push({
           role: "tool",
           name: toolName,
           content: JSON.stringify(result),
         });
-
         session.messages = messages;
         saveSession(name, session);
-
         continue;
       }
 
       // --- 3. No tool calls → final answer ---
       const finalAnswer = msg.content || "";
-
       messages.push({ role: "assistant", content: finalAnswer });
-
       // Persist final answer
       session.messages = messages;
       saveSession(name, session);
-
+      
+      // ⭐ Compute total task duration------------NEW TEST CODE
+      const taskDurationMs = Date.now() - taskStart;      
+      
       return res.json({
         output: finalAnswer,
-        sessionId: sid
+        sessionId: sid,
+        tokensPerSecond,
+        taskDurationMs
       });
     }
   } catch (e) {
     console.error("Runtime error:", e);
-
     // Persist error state
     session.state = {
       status: "error",
       lastError: e.message || String(e)
     };
     saveSession(name, session);
-
     return res.status(500).json({ error: e.message || String(e) });
   }
 });

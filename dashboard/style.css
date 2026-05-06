@@ -53,6 +53,10 @@ li {
     border-bottom: 1px solid #333;
 }
 
+
+
+
+
 /* --- Agent Subwindow Panel --- */
 #agent-list-title {
     color: rgb(255, 120, 0); /* amber/orange */
@@ -160,6 +164,28 @@ li {
     background: #ff7070;
 }
 
+/* ⭐ Agent Telemetry Box */
+.agent-metric-box {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(255, 200, 0, 0.08);
+    border: 1px solid rgba(255, 200, 0, 0.35);
+    border-radius: 6px;
+    font-size: 14px;
+    color: #ffc800;
+    width: fit-content;
+    user-select: none;
+}
+
+#agent-tps-value,
+#agent-duration-value {
+    font-weight: bold;
+    color: #ffc800;
+}
+
+
+
+
 /* --- Model Subwindow Panel --- */
 #model-list-title {
     color: rgb(0, 234, 255); /* cyan */
@@ -186,7 +212,7 @@ li {
     text-align: center;
 }
 
-/* Enable scrolling inside the model subwindow */
+/* scrolling inside model subwindow */
 #model-panel-content {
     max-height: 70vh;      /* keeps the panel from growing too tall */
     overflow-y: auto;      /* vertical scrollbar appears when needed */
@@ -263,6 +289,28 @@ li {
     background: #ff7070;
 }
 
+/* ⭐ Model TPS Telemetry Box */
+.model-metric-box {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(0, 255, 255, 0.08);
+    border: 1px solid rgba(0, 255, 255, 0.35);
+    border-radius: 6px;
+    font-size: 14px;
+    color: #0ff;
+    width: fit-content;
+    user-select: none;
+}
+
+#model-tps-value {
+    font-weight: bold;
+    color: #0ff;
+}
+
+
+
+
+
 /* --- Agent Profile Picture (Large) --- */
 .profile-pic {
     width: 70px;
@@ -286,6 +334,10 @@ li {
     vertical-align: middle;
     box-shadow: 0 0 6px rgba(0, 234, 255, 0.3);
 }
+
+
+
+
 
 /* Terminal Panel */
 #terminal-container {
@@ -328,6 +380,10 @@ li {
     flex: 1;
     overflow-y: auto;
 }
+
+
+
+
 
 /* ⭐ Vertical Sidebar */
 #sidebar {
@@ -389,10 +445,63 @@ li {
     opacity: 0.7;
 }
 
+/* ⭐ METRICS TAB — SYSTEM METRICS PANEL */
+#metrics-panel {
+    padding: 10px;
+    color: #0ff;
+    font-family: monospace;
+}
+
+#metrics-panel h3 {
+    margin-top: 0;
+    color: rgb(0, 255, 0);
+    text-align: center;
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.metric-item label {
+    width: 60px;
+    font-weight: bold;
+    color: #0ff;
+}
+
+.metric-bar {
+    flex: 1;
+    height: 20px;
+    background: #333;
+    border: 1px solid #0ff;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.metric-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #0ff, #00ff88);
+    width: 0%; /* will be set by JS */
+    transition: width 0.5s ease;
+}
+
+.metric-item span {
+    width: 80px;
+    text-align: right;
+    font-size: 12px;
+    color: #eee;
+}
+
 /* Push main content right so sidebar doesn't overlap */
 #container, #columns, #agent-panel, #model-panel, #logo {
     margin-left: 140px; /* adjust as needed */
 }
+
+
+
+
 
 /* ⭐ MEMORY TAB — GLOBAL MEMORY BROWSER (Container for the entire memory panel) */
 #memory-panel {

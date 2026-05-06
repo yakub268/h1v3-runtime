@@ -112,7 +112,6 @@ function openAgentPanel(agentName) {
             input,
             sessionId: currentSessionId || undefined
         };
-
         const res = await fetch(`http://localhost:3928/agent/${agentName}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -126,7 +125,19 @@ function openAgentPanel(agentName) {
             currentSessionId = data.sessionId;
         }
 
-        //const data = await res.json();
+        // ⭐ Update Agent TPS + Task Duration metrics
+        const tpsSpan = document.getElementById("agent-tps-value");
+        const durationSpan = document.getElementById("agent-duration-value");
+
+        if (tpsSpan) {
+            tpsSpan.textContent = data.tokensPerSecond || "--";
+        }
+
+        if (durationSpan) {
+            durationSpan.textContent = data.taskDurationMs
+                ? data.taskDurationMs + " ms"
+                : "--";
+        }
 
         // ⭐ Show avatar next to agent response
         responseBox.innerHTML = `
@@ -135,7 +146,7 @@ function openAgentPanel(agentName) {
                 <span>${data.output}</span>
             </div>
         `;
-            };
+    };
 }
 
 
@@ -146,16 +157,13 @@ function openModelPanel(modelName) {
     const status = document.getElementById("model-status");
     const info = document.getElementById("model-info");
     const pic = document.getElementById("model-profile-pic");
-
     title.textContent = modelName;
-
     // ⭐ Fetch model info (status + profile pic + metadata)
     fetch(`http://localhost:3928/api/model/${modelName}/info`)
         .then(res => res.json())
         .then(data => {
             status.innerHTML = `<b>Status:</b> ${data.status || "Loaded"}`;
             info.innerHTML = `<b>Info:</b> ${data.info || "(none)"}`;
-
             // ⭐ Profile picture
             if (data.profilePic) {
                 pic.src = data.profilePic;
@@ -172,28 +180,36 @@ function openModelPanel(modelName) {
             pic.src = "/assets/model_pics/default.png";
             pic.style.display = "block";
         });
-
     panel.classList.remove("hidden");
 
     document.getElementById("model-send").onclick = async () => {
         const input = document.getElementById("model-input").value;
         const responseBox = document.getElementById("model-response");
-
+        const tpsSpan = document.getElementById("model-tps-value"); // ⭐ will exist after UI step
         const res = await fetch(`http://localhost:3928/model/${modelName}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ input })
         });
-
         const data = await res.json();
-
-        // ⭐ Show avatar next to model response
+        // ⭐ Update response with avatar
         responseBox.innerHTML = `
             <div class="agent-message">
                 <img src="${pic.src}" class="profile-pic-small">
                 <span>${data.output}</span>
             </div>
         `;
+        // ⭐ Update TPS metric (basic per-generation)
+        if (tpsSpan) {
+            if (data.tokensPerSecond) {
+                tpsSpan.textContent = data.tokensPerSecond;
+            } else {
+                tpsSpan.textContent = "--";
+            }
+        } else {
+            // Fallback for now while UI element doesn’t exist yet
+            console.log("Tokens/sec:", data.tokensPerSecond);
+        }
     };
 }
 
@@ -285,6 +301,86 @@ document.getElementById("tab-memory").addEventListener("click", () => {
 document.getElementById("tab-schedule").addEventListener("click", () => {
     document.getElementById("schedule-content").classList.toggle("hidden");
 });
+
+
+//----------⭐Sidebar Metrics Toggle Logic
+document.getElementById("tab-metrics").addEventListener("click", () => {
+    document.getElementById("metrics-content").classList.toggle("hidden");
+    // Start updating metrics when opened
+    if (!document.getElementById("metrics-content").classList.contains("hidden")) {
+        startMetricsUpdate();
+    } else {
+        stopMetricsUpdate();
+    }
+});
+
+
+//----------⭐METRICS TAB — SYSTEM METRICS UPDATER
+let metricsInterval = null;
+
+function startMetricsUpdate() {
+    if (metricsInterval) return; // already running
+    updateMetrics(); // immediate update
+    metricsInterval = setInterval(updateMetrics, 2000); // update every 2 seconds
+}
+
+function stopMetricsUpdate() {
+    if (metricsInterval) {
+        clearInterval(metricsInterval);
+        metricsInterval = null;
+    }
+}
+
+async function updateMetrics() {
+    try {
+        const res = await fetch("http://localhost:3928/api/metrics");
+        const data = await res.json();
+
+        // Update CPU
+        document.getElementById("cpu-bar").style.width = `${data.cpu || 0}%`;
+        document.getElementById("cpu-text").textContent = `${data.cpu || 0}%`;
+
+        // Update GPU
+        document.getElementById("gpu-bar").style.width = `${data.gpu || 0}%`;
+        document.getElementById("gpu-text").textContent = `${data.gpu || 0}%`;
+
+        // Update RAM
+        const ramUsed = data.ram?.used || 0;
+        const ramTotal = data.ram?.total || 1;
+        const ramPercent = Math.round((ramUsed / ramTotal) * 100);
+        document.getElementById("ram-bar").style.width = `${ramPercent}%`;
+        document.getElementById("ram-text").textContent = `${ramUsed}GB / ${ramTotal}GB`;
+
+        // Update VRAM
+        const vramUsed = data.vram?.used || 0;
+        const vramTotal = data.vram?.total || 1;
+        const vramPercent = Math.round((vramUsed / vramTotal) * 100);
+        document.getElementById("vram-bar").style.width = `${vramPercent}%`;
+        document.getElementById("vram-text").textContent = `${vramUsed}GB / ${vramTotal}GB`;
+
+        // Update Disk
+        const diskUsed = data.disk?.used || 0;
+        const diskTotal = data.disk?.total || 1;
+        const diskPercent = Math.round((diskUsed / diskTotal) * 100);
+        document.getElementById("disk-bar").style.width = `${diskPercent}%`;
+        document.getElementById("disk-text").textContent = `${diskUsed}GB / ${diskTotal}GB`;
+
+        // Update Network
+        const netDown = data.network?.down || 0;
+        const netUp = data.network?.up || 0;
+        document.getElementById("network-text").textContent = `⬇️ ${netDown} MB/s | ⬆️ ${netUp} MB/s`;
+
+    } catch (err) {
+        console.error("Error updating metrics:", err);
+        // Set defaults on error
+        document.getElementById("cpu-text").textContent = "N/A";
+        document.getElementById("gpu-text").textContent = "N/A";
+        document.getElementById("ram-text").textContent = "N/A";
+        document.getElementById("vram-text").textContent = "N/A";
+        document.getElementById("disk-text").textContent = "N/A";
+        document.getElementById("network-text").textContent = "N/A";
+    }
+}
 
 
 //----------⭐MEMORY TAB — GLOBAL MEMORY BROWSER JS

@@ -40,9 +40,67 @@
         <div class="sidebar-content hidden" id="schedule-content">
             <p class="sidebar-placeholder">Agent scheduling coming soon...</p>
         </div>
-    </div>
-    <div id="sidebar-resizer"></div>
 
+        <div class="sidebar-tab" id="tab-metrics">Metrics</div>
+        <div class="sidebar-content hidden" id="metrics-content">
+            <div id="metrics-panel">
+                <h3>System Metrics</h3>
+
+                <!-- CPU -->
+                <div class="metric-item">
+                    <label>CPU:</label>
+                    <div class="metric-bar">
+                        <div id="cpu-bar" class="metric-fill"></div>
+                    </div>
+                    <span id="cpu-text">0%</span>
+                </div>
+
+                <!-- GPU -->
+                <div class="metric-item">
+                    <label>GPU:</label>
+                    <div class="metric-bar">
+                        <div id="gpu-bar" class="metric-fill"></div>
+                    </div>
+                    <span id="gpu-text">0%</span>
+                </div>
+
+                <!-- RAM -->
+                <div class="metric-item">
+                    <label>RAM:</label>
+                    <div class="metric-bar">
+                        <div id="ram-bar" class="metric-fill"></div>
+                    </div>
+                    <span id="ram-text">0GB / 0GB</span>
+                </div>
+
+                <!-- VRAM -->
+                <div class="metric-item">
+                    <label>VRAM:</label>
+                    <div class="metric-bar">
+                        <div id="vram-bar" class="metric-fill"></div>
+                    </div>
+                    <span id="vram-text">0GB / 0GB</span>
+                </div>
+
+                <!-- Disk -->
+                <div class="metric-item">
+                    <label>Disk:</label>
+                    <div class="metric-bar">
+                        <div id="disk-bar" class="metric-fill"></div>
+                    </div>
+                    <span id="disk-text">0GB / 0GB</span>
+                </div>
+
+                <!-- Network -->
+                <div class="metric-item">
+                    <label>Network:</label>
+                    <span id="network-text">⬇️ 0 MB/s | ⬆️ 0 MB/s</span>
+                </div>
+
+            </div>
+        </div>
+    <div id="sidebar-resizer"></div>
+    </div>
 
     <!-- ⭐ Agent and Model Lists -->
     <div id="container">
@@ -77,6 +135,16 @@
             <div id="agent-status"></div>
             <div id="agent-tools"></div>
 
+
+
+            <!-- ⭐ Agent TPS & Duration Telemetry Metrics -->
+            <div id="agent-metrics" class="agent-metric-box">
+                <b>Tokens/sec:</b> <span id="agent-tps-value">--</span><br>
+                <b>Task Duration:</b> <span id="agent-duration-value">--</span>
+            </div>
+
+
+
             <textarea id="agent-input" placeholder="Send a message to this agent.."></textarea>
             <button id="agent-send">Send</button>
 
@@ -97,6 +165,15 @@
             <div id="model-status"></div>
             <div id="model-info"></div>
 
+
+
+            <!-- ⭐ Tokens Per Second Telemetry -->
+            <div id="model-tps" class="model-metric-box">
+                <b>Tokens/sec:</b> <span id="model-tps-value">--</span>
+            </div>
+
+
+            
             <textarea id="model-input" placeholder="Send a message to this model..."></textarea>
             <button id="model-send">Send</button>
 
