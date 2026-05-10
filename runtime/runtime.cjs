@@ -73,9 +73,9 @@ const models = {
         profilePic: "/assets/model_pics/llama3.1_8b.png",
         info: "Meta LLaMA 3.1, 8B (4.9 GB)"
     },
-    "gemma4:e2b": {
-        profilePic: "/assets/model_pics/gemma4_e2b.png",
-        info: "Gemma 4, E2B Edition (7.2 GB)"
+    "gemma3n:e2b": {
+        profilePic: "/assets/model_pics/gemma3n_e2b.png",
+        info: "Gemma 3n, E2B Edition (5.6 GB)"
     }
 };
 
